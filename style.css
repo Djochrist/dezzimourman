@@ -47,7 +47,7 @@ html, body {
 /* ── TYPOGRAPHY ── */
 .h1 {
   font-family: var(--font-alt);
-  font-size: clamp(1.7rem, 4.5vw, 3.8rem);
+  font-size: clamp(2.6rem, 6.5vw, 5.5rem);
   line-height: 1.25;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -55,7 +55,7 @@ html, body {
 }
 .h2 {
   font-family: var(--font-alt);
-  font-size: clamp(1.5rem, 3.8vw, 3.2rem);
+  font-size: clamp(2.2rem, 5.5vw, 4.8rem);
   line-height: 1.25;
   font-weight: 600;
   margin-bottom: 0.75rem;
@@ -107,7 +107,7 @@ html, body {
   letter-spacing: 0.04em;
 }
 .logo-sub {
-  font-size: clamp(0.6rem, 1.8vw, 0.72rem);
+  font-size: clamp(0.85rem, 2.2vw, 1.1rem);
   font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -382,7 +382,7 @@ html, body {
 }
 
 .home-text p {
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   color: var(--text-dim);
   font-weight: 300;
   margin-bottom: 0.6rem;
@@ -390,7 +390,7 @@ html, body {
 }
 .hardcore-tag-home {
   font-family: var(--font-alt);
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -407,11 +407,11 @@ html, body {
 }
 @media (max-width: 480px) {
   .home-text .anim-group .h1 {
-    font-size: clamp(1.1rem, 5vw, 1.6rem);
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
     margin-bottom: 0.4rem;
   }
-  .home-text p { font-size: 0.75rem; }
-  .hardcore-tag-home { font-size: 0.75rem; margin-bottom: 0.5rem; }
+  .home-text p { font-size: 1rem; }
+  .hardcore-tag-home { font-size: 1.05rem; margin-bottom: 0.5rem; }
 }
 
 /* Discover button */
@@ -429,7 +429,7 @@ html, body {
   color: var(--white);
   padding: 0.6rem 1.4rem;
   font-family: var(--font-main);
-  font-size: 0.88rem;
+  font-size: 1.1rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   -webkit-tap-highlight-color: transparent;
@@ -762,7 +762,7 @@ html, body {
 }
 
 .about-para {
-  font-size: 0.88rem;
+  font-size: 1.2rem;
   color: var(--text-dim);
   font-weight: 300;
   line-height: 1.75;
@@ -771,10 +771,10 @@ html, body {
 }
 .about-para-2 { margin-bottom: 1.2rem; }
 @media (max-width: 960px) {
-  .about-para { margin-left: auto; margin-right: auto; font-size: 0.83rem; line-height: 1.65; }
+  .about-para { margin-left: auto; margin-right: auto; font-size: 1.05rem; line-height: 1.65; }
 }
 @media (max-width: 480px) {
-  .about-para { font-size: 0.8rem; margin-bottom: 0.5rem; line-height: 1.6; }
+  .about-para { font-size: 0.95rem; margin-bottom: 0.5rem; line-height: 1.6; }
   .about-para-2 { margin-bottom: 0.8rem; }
 }
 
@@ -839,24 +839,27 @@ html, body {
 #page-shows {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .shows-inner {
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex: 1;
-  height: 100%;
-  padding: var(--header-h) 20px var(--bottom-h);
+  min-height: 100%;
+  height: auto;
+  padding: var(--header-h) 20px calc(var(--bottom-h) + 2rem);
 }
 .shows-sub {
-  font-size: 0.88rem;
+  font-size: 1.2rem;
   color: var(--text-dim);
   font-weight: 300;
   margin-bottom: 1.8rem;
   max-width: 500px;
 }
 @media (max-width: 480px) {
-  .shows-sub { font-size: 0.82rem; margin-bottom: 1.2rem; }
+  .shows-sub { font-size: 0.95rem; margin-bottom: 1.2rem; }
 }
 .shows-grid {
   display: flex;
@@ -914,12 +917,12 @@ html, body {
 .show-info { flex: 1; }
 .show-title {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.35rem;
   margin-bottom: 0.25rem;
   letter-spacing: 0.01em;
 }
 .show-loc {
-  font-size: 0.72rem;
+  font-size: 1rem;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -946,7 +949,7 @@ html, body {
   background: transparent;
   color: var(--white);
   font-family: var(--font-main);
-  font-size: 0.88rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: border-color 0.3s, color 0.3s;
   -webkit-tap-highlight-color: transparent;
@@ -957,24 +960,27 @@ html, body {
 #page-annonces {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .annonces-inner {
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex: 1;
-  height: 100%;
-  padding: var(--header-h) 20px var(--bottom-h);
+  min-height: 100%;
+  height: auto;
+  padding: var(--header-h) 20px calc(var(--bottom-h) + 2rem);
 }
 .annonces-sub {
-  font-size: 0.88rem;
+  font-size: 1.2rem;
   color: var(--text-dim);
   font-weight: 300;
   margin-bottom: 2rem;
   max-width: 500px;
 }
 @media (max-width: 480px) {
-  .annonces-sub { font-size: 0.82rem; margin-bottom: 1.4rem; }
+  .annonces-sub { font-size: 0.95rem; margin-bottom: 1.4rem; }
 }
 .annonces-list {
   display: flex;
@@ -1071,7 +1077,7 @@ html, body {
 }
 .annonce-title {
   font-family: var(--font-alt);
-  font-size: 1.15rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.45rem;
   letter-spacing: 0.01em;
@@ -1080,7 +1086,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.76rem;
+  font-size: 1rem;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -1103,6 +1109,8 @@ html, body {
 #page-contact {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .contact-inner {
   display: flex;
@@ -1110,8 +1118,9 @@ html, body {
   justify-content: center;
   align-items: center;
   flex: 1;
-  height: 100%;
-  padding: var(--header-h) 20px var(--bottom-h);
+  min-height: 100%;
+  height: auto;
+  padding: var(--header-h) 20px calc(var(--bottom-h) + 2rem);
   text-align: center;
 }
 .contact-inner .h2 { margin-bottom: 1.5rem; }
@@ -1196,7 +1205,7 @@ html, body {
   .contact-icon svg { width: 20px !important; height: 20px !important; }
 }
 .contact-label {
-  font-size: 0.62rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--text-dim);
@@ -1204,11 +1213,11 @@ html, body {
 }
 .contact-value {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   letter-spacing: 0.01em;
 }
 @media (max-width: 600px) {
-  .contact-value { font-size: 0.82rem; }
+  .contact-value { font-size: 1rem; }
 }
 
 /* ── PAGE DOTS (mobile) ── */
