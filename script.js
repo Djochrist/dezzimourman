@@ -46,6 +46,7 @@ function navigateTo(pageName) {
     updateNavButtons(pageName);
     if (pageName === 'home') { initAnimation(); typewriterHeadline(); }
     else stopAnimation();
+    document.dispatchEvent(new CustomEvent('pagechange', { detail: pageName }));
   }, 500);
 }
 
@@ -522,12 +523,68 @@ function initSwipe() {
   }, { passive: true });
 }
 
+// ── GYROSCOPE PARALLAX (mobile) ──
+function initOrientationParallax() {
+  if (window.innerWidth > 1199) return;
+
+  const photoLayer = document.querySelector('.home-right');
+  const canvas     = document.getElementById('particles-canvas');
+  if (!photoLayer) return;
+
+  const MAX   = 14;   // max px shift for photo
+  const RATIO = 0.35; // canvas moves opposite at 35% of photo shift
+  let tX = 0, tY = 0, cX = 0, cY = 0;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  let rafId;
+  function tick() {
+    cX = lerp(cX, tX, 0.07);
+    cY = lerp(cY, tY, 0.07);
+    photoLayer.style.transform = `translate(${cX}px, ${cY}px)`;
+    if (canvas) canvas.style.transform = `translate(${-cX * RATIO}px, ${-cY * RATIO}px)`;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function handleOrientation(e) {
+    const gamma = Math.max(-35, Math.min(35, e.gamma || 0));
+    const beta  = Math.max(-25, Math.min(25, (e.beta  || 45) - 45));
+    tX = (gamma / 35) * MAX;
+    tY = (beta  / 25) * MAX;
+  }
+
+  function start() {
+    window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // iOS 13+ requires explicit permission after a user gesture
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.addEventListener('touchstart', function askPerm() {
+      document.removeEventListener('touchstart', askPerm);
+      DeviceOrientationEvent.requestPermission()
+        .then(s => { if (s === 'granted') start(); })
+        .catch(() => {});
+    }, { once: true, passive: true });
+  } else if (window.DeviceOrientationEvent) {
+    start();
+  }
+
+  // Stop RAF when not on home page
+  document.addEventListener('pagechange', e => {
+    if (e.detail === 'home') { if (!rafId) rafId = requestAnimationFrame(tick); }
+    else { cancelAnimationFrame(rafId); rafId = null; photoLayer.style.transform = ''; if (canvas) canvas.style.transform = ''; }
+  });
+}
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
   injectBottomNav();
   initAnimation();
   typewriterHeadline();
   initSwipe();
+  initOrientationParallax();
   document.querySelectorAll('.dot').forEach(dot => {
     dot.addEventListener('click', () => navigateTo(dot.dataset.page));
   });

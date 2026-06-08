@@ -209,7 +209,7 @@ html, body {
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid rgba(255,255,255,0.07);
   height: var(--bottom-h);
-  padding: 0 1rem;
+  padding: 0 0.25rem;
   align-items: center;
   justify-content: space-around;
 }
@@ -228,9 +228,10 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   transition: color 0.25s;
-  padding: 8px 12px;
+  padding: 8px 4px;
   -webkit-tap-highlight-color: transparent;
   flex: 1;
+  min-width: 0;
 }
 .bottom-nav-btn svg { width: 1.25rem; height: 1.25rem; }
 .bottom-nav-btn.active { color: var(--accent); }
@@ -552,7 +553,7 @@ html, body {
     top: auto;
     left: 0;
     right: 0;
-    bottom: calc(var(--bottom-h) + 6rem);
+    bottom: calc(var(--bottom-h) + 10rem);
     padding-top: 0;
     padding-bottom: 0;
     padding-left: 38%;
@@ -576,7 +577,7 @@ html, body {
 /* Très petits écrans : encore un peu plus haut */
 @media (max-width: 480px) {
   .home-text {
-    bottom: calc(var(--bottom-h) + 4.5rem);
+    bottom: calc(var(--bottom-h) + 7.5rem);
     padding-left: 36%;
     padding-right: 1rem;
   }
@@ -634,7 +635,7 @@ html, body {
 @media (max-width: 1199px) {
   .avatar-wrap {
     position: absolute;
-    bottom: 0;
+    bottom: -6%;
     left: 0;
     right: 0;
     width: 100%;
