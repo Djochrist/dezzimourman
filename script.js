@@ -2,28 +2,49 @@
 
 // ── PAGE ROUTING ──
 let currentPage = 'home';
+const PAGE_ORDER = ['home', 'about', 'shows', 'annonces', 'contact'];
 
 function navigateTo(pageName) {
   if (pageName === currentPage) return;
   const oldPage = document.getElementById('page-' + currentPage);
   const newPage = document.getElementById('page-' + pageName);
   if (!newPage) return;
+
+  const oldIdx = PAGE_ORDER.indexOf(currentPage);
+  const newIdx = PAGE_ORDER.indexOf(pageName);
+  const forward = newIdx > oldIdx;
+
+  // Prépare la nouvelle page hors-écran avant de la rendre visible
+  newPage.classList.add(forward ? 'enter-right' : 'enter-left');
+  void newPage.offsetWidth; // force reflow
+
+  // Sort l'ancienne page
   oldPage.classList.remove('active');
-  oldPage.classList.add('exit');
+  oldPage.classList.add(forward ? 'exit-left' : 'exit-right');
+
+  // Entre la nouvelle page
+  newPage.classList.add('active');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      newPage.classList.remove('enter-right', 'enter-left');
+    });
+  });
+
   setTimeout(() => {
-    oldPage.classList.remove('exit');
-    newPage.classList.add('active');
-    void newPage.offsetWidth;
+    oldPage.classList.remove('exit-left', 'exit-right');
     currentPage = pageName;
     updateNavButtons(pageName);
     if (pageName === 'home') { initAnimation(); typewriterHeadline(); }
     else stopAnimation();
-  }, 50);
+  }, 420);
 }
 
 function updateNavButtons(pageName) {
   document.querySelectorAll('.nav-btn, .bottom-nav-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.page === pageName);
+  });
+  document.querySelectorAll('.dot').forEach(dot => {
+    dot.classList.toggle('active', dot.dataset.page === pageName);
   });
 }
 
@@ -392,6 +413,12 @@ function injectBottomNav() {
       </svg>
       Spectacles
     </button>
+    <button class="bottom-nav-btn" data-page="annonces" onclick="navigateTo('annonces')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Annonces
+    </button>
     <button class="bottom-nav-btn" data-page="contact" onclick="navigateTo('contact')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
@@ -463,9 +490,35 @@ function typewriterHeadline() {
   setTimeout(tick, delay);
 }
 
+// ── SWIPE MOBILE ──
+function initSwipe() {
+  let startX = null, startY = null;
+  const THRESHOLD = 55;
+
+  document.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) < THRESHOLD || Math.abs(dy) > Math.abs(dx) * 1.2) return;
+    const idx = PAGE_ORDER.indexOf(currentPage);
+    if (dx < 0 && idx < PAGE_ORDER.length - 1) navigateTo(PAGE_ORDER[idx + 1]);
+    else if (dx > 0 && idx > 0)               navigateTo(PAGE_ORDER[idx - 1]);
+    startX = null; startY = null;
+  }, { passive: true });
+}
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
   injectBottomNav();
   initAnimation();
   typewriterHeadline();
+  initSwipe();
+  document.querySelectorAll('.dot').forEach(dot => {
+    dot.addEventListener('click', () => navigateTo(dot.dataset.page));
+  });
 });
