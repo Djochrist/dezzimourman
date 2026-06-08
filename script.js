@@ -16,7 +16,7 @@ function navigateTo(pageName) {
     void newPage.offsetWidth;
     currentPage = pageName;
     updateNavButtons(pageName);
-    if (pageName === 'home') initAnimation();
+    if (pageName === 'home') { initAnimation(); typewriterHeadline(); }
     else stopAnimation();
   }, 50);
 }
@@ -34,7 +34,7 @@ let animFrame = null;
 
 // ── DATA ──
 const TIKTOK_COMMENTS = [
-  { user: '@kalimement',   text: "Ah donc c'était toi qui voulait le lait à la maison 😂😂😂", likes: '14k',  color: '#ff2d55' },
+  { user: '@kalimement',   text: "Ah donc c'était toi qui volait le lait à la maison 😂😂😂", likes: '14k',  color: '#ff2d55' },
   { user: '@cendrillion',  text: "T'es trop hardcore mec 😂😂🔥",                              likes: '8.2k', color: '#00f2ea' },
   { user: '@irkumso',      text: "Je vous invite à nos events, venez ! 🎤",                   likes: '21k',  color: '#ff2d55' },
   { user: '@legende',      text: "Limbisa nga mais... 😂😂😂",                               likes: '5.7k', color: '#00f2ea' },
@@ -54,11 +54,12 @@ function nextComment() {
 }
 
 const BIG_STICKERS  = ['😂','🤣','😆','💀','🔥','🎭','😭','💯','👏','🤩','🥲','🫡'];
-const HA_BURSTS     = ['Ha!','Haha!','HaHaHa!','LMAO','MDR','Hahahaha!','💀💀'];
+const HA_BURSTS     = ['Ha!','Haha!','HaHaHa!','Kalime','MDR','Hahahaha!','💀💀'];
 
 // ── NEURAL NODES ──
 let neurons = [];
-const NEURON_COUNT = 34;
+const isMobile = window.innerWidth <= 1199;
+const NEURON_COUNT = isMobile ? 16 : 34;
 
 function buildNeurons(W, H) {
   neurons = [];
@@ -298,8 +299,9 @@ function initAnimation() {
   canvas.addEventListener('mouseleave', onLeave);
 
   // Seed initial floaters spread across screen
+  const seedCount = isMobile ? 6 : 16;
   const seedTypes = ['comment','comment','sticker','sticker','sticker','ha','ha','ha','ha'];
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < seedCount; i++) {
     const t = seedTypes[i % seedTypes.length];
     const f = makeFloater(canvas, t);
     f.y    = Math.random() * canvas.height;
@@ -319,7 +321,8 @@ function initAnimation() {
 
     // ── Layer 2: Floating items ──
     // Spawn
-    if (floaters.length < 20 && Math.random() < 0.045) {
+    const maxFloaters = isMobile ? 8 : 20;
+    if (floaters.length < maxFloaters && Math.random() < 0.045) {
       floaters.push(makeFloater(canvas, null));
     }
 
@@ -399,8 +402,70 @@ function injectBottomNav() {
   document.body.appendChild(nav);
 }
 
+// ── TYPEWRITER HEADLINE ──
+function typewriterHeadline() {
+  const el = document.getElementById('home-headline');
+  if (!el) return;
+
+  const segments = [
+    { text: 'Attention\u00a0:',       br: true },
+    { text: 'humour susceptible',     br: true },
+    { text: 'de contenir',            br: true },
+    { text: "de\u00a0l\u2019humour.", accent: true }
+  ];
+
+  el.innerHTML = '';
+  el.style.opacity = '1';
+
+  let si = 0, ci = 0, node = null;
+
+  function tick() {
+    if (si >= segments.length) {
+      // blinking cursor — stays for 3s then fades out
+      const cur = document.createElement('span');
+      cur.className = 'type-cursor';
+      cur.textContent = '|';
+      el.appendChild(cur);
+      setTimeout(() => {
+        cur.style.transition = 'opacity 0.6s';
+        cur.style.opacity = '0';
+        setTimeout(() => cur.remove(), 700);
+      }, 3000);
+      return;
+    }
+
+    const seg = segments[si];
+
+    if (ci === 0) {
+      if (seg.accent) {
+        node = document.createElement('span');
+        node.className = 'text-accent';
+        el.appendChild(node);
+      } else {
+        node = document.createTextNode('');
+        el.appendChild(node);
+      }
+    }
+
+    if (ci < seg.text.length) {
+      if (seg.accent) node.textContent += seg.text[ci];
+      else            node.nodeValue   += seg.text[ci];
+      ci++;
+      setTimeout(tick, 42);
+    } else {
+      if (seg.br) el.appendChild(document.createElement('br'));
+      si++; ci = 0; node = null;
+      setTimeout(tick, seg.br ? 160 : 42);
+    }
+  }
+
+  const delay = window.innerWidth <= 1199 ? 2150 : 380;
+  setTimeout(tick, delay);
+}
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
   injectBottomNav();
   initAnimation();
+  typewriterHeadline();
 });
