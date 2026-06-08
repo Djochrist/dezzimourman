@@ -14,6 +14,12 @@ function navigateTo(pageName) {
   const newIdx = PAGE_ORDER.indexOf(pageName);
   const forward = newIdx > oldIdx;
 
+  // ── Cinematic curtain sweep ──
+  const curtain = document.createElement('div');
+  curtain.className = 'page-curtain';
+  document.body.appendChild(curtain);
+  setTimeout(() => curtain.remove(), 560);
+
   // Prépare la nouvelle page hors-écran avant de la rendre visible
   newPage.classList.add(forward ? 'enter-right' : 'enter-left');
   void newPage.offsetWidth; // force reflow
@@ -22,11 +28,15 @@ function navigateTo(pageName) {
   oldPage.classList.remove('active');
   oldPage.classList.add(forward ? 'exit-left' : 'exit-right');
 
-  // Entre la nouvelle page
-  newPage.classList.add('active');
+  // Entre la nouvelle page (légèrement décalé pour coïncider avec la fin du rideau)
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      newPage.classList.remove('enter-right', 'enter-left');
+      newPage.classList.add('active');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          newPage.classList.remove('enter-right', 'enter-left');
+        });
+      });
     });
   });
 
@@ -36,7 +46,7 @@ function navigateTo(pageName) {
     updateNavButtons(pageName);
     if (pageName === 'home') { initAnimation(); typewriterHeadline(); }
     else stopAnimation();
-  }, 420);
+  }, 500);
 }
 
 function updateNavButtons(pageName) {
@@ -102,7 +112,6 @@ function drawNeurons(ctx, W, H, mouse) {
   const LINK = 160;
   // update positions
   for (const n of neurons) {
-    // mouse repulsion
     n.rx = 0; n.ry = 0;
     if (mouse.x !== null) {
       const dx = n.x - mouse.x, dy = n.y - mouse.y;
@@ -115,7 +124,6 @@ function drawNeurons(ctx, W, H, mouse) {
     }
     n.vx = n.vx * 0.98 + n.rx * 0.06;
     n.vy = n.vy * 0.98 + n.ry * 0.06;
-    // clamp speed
     const spd = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
     if (spd > 2.2) { n.vx = n.vx/spd*2.2; n.vy = n.vy/spd*2.2; }
     n.x += n.vx; n.y += n.vy;
@@ -123,16 +131,19 @@ function drawNeurons(ctx, W, H, mouse) {
     if (n.y < 0 || n.y > H) n.vy *= -1;
     n.pulse += 0.025;
   }
-  // draw links
+  // draw links — mostly green, occasional red accent
   for (let i = 0; i < neurons.length; i++) {
     for (let j = i+1; j < neurons.length; j++) {
       const dx = neurons[i].x - neurons[j].x;
       const dy = neurons[i].y - neurons[j].y;
       const d  = Math.sqrt(dx*dx + dy*dy);
       if (d < LINK) {
-        const op = (1 - d/LINK) * 0.28;
+        const op = (1 - d/LINK) * 0.2;
+        const useRed = (i + j) % 5 === 0;
         ctx.beginPath();
-        ctx.strokeStyle = `rgba(140,146,153,${op})`;
+        ctx.strokeStyle = useRed
+          ? `rgba(255,45,85,${op})`
+          : `rgba(0,201,177,${op})`;
         ctx.lineWidth = 1;
         ctx.moveTo(neurons[i].x, neurons[i].y);
         ctx.lineTo(neurons[j].x, neurons[j].y);
@@ -140,22 +151,23 @@ function drawNeurons(ctx, W, H, mouse) {
       }
     }
   }
-  // draw nodes
-  for (const n of neurons) {
+  // draw nodes — mostly green, ~1 in 4 red
+  for (let ni = 0; ni < neurons.length; ni++) {
+    const n = neurons[ni];
     const pulse = 0.7 + 0.3 * Math.sin(n.pulse);
     const r = n.r * pulse;
-    // glow
-    const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r*3.5);
-    g.addColorStop(0, `rgba(160,170,180,${0.35 * pulse})`);
-    g.addColorStop(1, 'rgba(160,170,180,0)');
+    const isRed = ni % 4 === 0;
+    const col = isRed ? '255,45,85' : '0,201,177';
+    const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r*4);
+    g.addColorStop(0, `rgba(${col},${0.28 * pulse})`);
+    g.addColorStop(1, `rgba(${col},0)`);
     ctx.beginPath();
-    ctx.arc(n.x, n.y, r*3.5, 0, Math.PI*2);
+    ctx.arc(n.x, n.y, r*4, 0, Math.PI*2);
     ctx.fillStyle = g;
     ctx.fill();
-    // core
     ctx.beginPath();
     ctx.arc(n.x, n.y, r, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(190,200,210,${0.7 * pulse})`;
+    ctx.fillStyle = `rgba(${col},${0.7 * pulse})`;
     ctx.fill();
   }
 }
@@ -420,7 +432,7 @@ function injectBottomNav() {
       Annonces
     </button>
     <button class="bottom-nav-btn" data-page="contact" onclick="navigateTo('contact')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="-1 -1 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
       </svg>
       Contact
@@ -434,11 +446,10 @@ function typewriterHeadline() {
   const el = document.getElementById('home-headline');
   if (!el) return;
 
+  // Line 1: name (white), Line 2: title (green accent)
   const segments = [
-    { text: 'Attention\u00a0:',       br: true },
-    { text: 'humour susceptible',     br: true },
-    { text: 'de contenir',            br: true },
-    { text: "de\u00a0l\u2019humour.", accent: true }
+    { text: "Seigneur\u00a0De\u2019Zimour", br: true },
+    { text: 'Humouriste',                   accent: true }
   ];
 
   el.innerHTML = '';
@@ -448,7 +459,6 @@ function typewriterHeadline() {
 
   function tick() {
     if (si >= segments.length) {
-      // blinking cursor — stays for 3s then fades out
       const cur = document.createElement('span');
       cur.className = 'type-cursor';
       cur.textContent = '|';
@@ -457,7 +467,7 @@ function typewriterHeadline() {
         cur.style.transition = 'opacity 0.6s';
         cur.style.opacity = '0';
         setTimeout(() => cur.remove(), 700);
-      }, 3000);
+      }, 2500);
       return;
     }
 
@@ -478,15 +488,15 @@ function typewriterHeadline() {
       if (seg.accent) node.textContent += seg.text[ci];
       else            node.nodeValue   += seg.text[ci];
       ci++;
-      setTimeout(tick, 42);
+      setTimeout(tick, seg.accent ? 55 : 38);
     } else {
       if (seg.br) el.appendChild(document.createElement('br'));
       si++; ci = 0; node = null;
-      setTimeout(tick, seg.br ? 160 : 42);
+      setTimeout(tick, seg.br ? 200 : 38);
     }
   }
 
-  const delay = window.innerWidth <= 1199 ? 2150 : 380;
+  const delay = window.innerWidth <= 1199 ? 2150 : 350;
   setTimeout(tick, delay);
 }
 
