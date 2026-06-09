@@ -449,7 +449,7 @@ function typewriterHeadline() {
 
   // Line 1: name (white), Line 2: title (green accent)
   const segments = [
-    { text: "Seigneur\u00a0De\u2019Zimour", br: true },
+    { text: "De\u2019Zimour", br: true },
     { text: 'Humouriste',                   accent: true }
   ];
 

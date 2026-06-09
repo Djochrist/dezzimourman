@@ -87,7 +87,7 @@ html, body {
 .header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 2rem;
   height: 100%;
   display: flex;
   align-items: center;
@@ -1120,12 +1120,13 @@ html, body {
   flex: 1;
   min-height: 100%;
   height: auto;
-  padding: var(--header-h) 20px calc(var(--bottom-h) + 2rem);
+  padding: calc(var(--header-h) + 1.5rem) 2rem calc(var(--bottom-h) + 2.5rem);
   text-align: center;
 }
 .contact-inner .h2 { margin-bottom: 1.5rem; }
 @media (max-width: 480px) {
   .contact-inner .h2 { margin-bottom: 1rem; }
+  .contact-inner { padding: calc(var(--header-h) + 2rem) 1.2rem calc(var(--bottom-h) + 2.5rem); }
 }
 .contact-options {
   display: grid;
